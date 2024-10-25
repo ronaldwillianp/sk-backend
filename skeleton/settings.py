@@ -12,10 +12,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -27,13 +28,19 @@ SECRET_KEY = 'django-insecure-v*3s5qxr8ap4@6nblx59m#nno9&kku&v!kth85iufoq1i84f-e
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
+# Application definition
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+    ]
+}
+
 AUTH_USER_MODEL = 'administracion.User'
-
-
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Default apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,14 +50,21 @@ INSTALLED_APPS = [
 
     # Django Rest Framework for APIs
     'rest_framework',
-    # Django-Knox for Authentication, Authorization & Tokens Management
-    'knox',
+
+    # Django-JWT for Authentication, Authorization & Tokens Management
+
+
     # Django CORS for local requests
     "corsheaders",
 
-    # System Modules
-    # 'administration.apps.AdministrationConfig',
+    ######################
+    ### System Modules ###
+    ######################
+
+    # Backend APPs
     'administracion.apps.AdministracionConfig',
+
+    # Frontend APPs
 
 ]
 
@@ -67,13 +81,27 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
 ]
 
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:9000',
+    'http://127.0.0.1:9000',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+)
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'contenttype',
+]
+
 ROOT_URLCONF = 'skeleton.urls'
+
+# Declaring custom User model
+AUTH_USER_MODEL = 'administracion.User'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Donde estan ubicados los compilados del front-end
-        'DIRS': [os.path.join(BASE_DIR, 'frontend/dist')],
+        'DIRS': [os.path.join(BASE_DIR, 'frontend/dist/spa/')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -86,40 +114,7 @@ TEMPLATES = [
     },
 ]
 
-# Rest Framework Configurations
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.BasicAuthentication",
-        "knox.auth.TokenAuthentication",
-    ]
-
-}
-
-# CORS Configurations
-
-CORS_ALLOW_METHODS = (
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-)
-
-CORS_ALLOW_HEADERS = (
-    "accept",
-    "authorization",
-    "content-type",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-)
-
-CORS_ALLOW_CREDENTIALS= True
-CORS_ALLOW_ALL_ORIGINS = True
-
 WSGI_APPLICATION = 'skeleton.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -130,7 +125,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -150,32 +144,32 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'es-es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Havana'
 
 USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-# STATIC_URL = 'static/'
+# Static URLs
 STATIC_URL = 'assets/'
 
 STATICFILES_DIRS = [
-    # Rutas a los estaticos del compilado
-    os.path.join(BASE_DIR, 'frontend/dist/'),
-    os.path.join(BASE_DIR, 'frontend/dist/spa/'),
-    os.path.join(BASE_DIR, 'frontend/dist/spa/assets'),
-    os.path.join(BASE_DIR, 'frontend/dist/spa/icons'),
+    os.path.join(BASE_DIR, 'frontend/dist/spa/assets/'),
+    os.path.join(BASE_DIR, 'frontend/dist/spa/icons/'),
+    os.path.join(BASE_DIR, 'frontend/dist/spa/products/'),
+    # Puedes agregar mas carpetas si es necesario
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
